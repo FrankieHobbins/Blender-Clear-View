@@ -20,6 +20,7 @@ class ClearView(bpy.types.Operator):
     bool1 = bpy.props.BoolProperty(name="Keep body group", default = True)
     bool2 = bpy.props.BoolProperty(name="Move", default = True)
     bool3 = bpy.props.BoolProperty(name="Keep others visible")
+    bool4 = bpy.props.BoolProperty(name="Ignore world", default = True)
 
     def execute(self, context):
         s = self.my_string
@@ -35,6 +36,9 @@ class ClearView(bpy.types.Operator):
             if self.bool3 == False:
                 o.hide = True
             if (s in o.name):
+                if self.bool4 == True and "world" in o.name:
+                    print ("continune")
+                    continue
                 o.hide = False
                 i = 0
                 for l in o.layers:
@@ -60,6 +64,7 @@ class ClearView(bpy.types.Operator):
         #Move objects +1 on x
         if self.bool2 == True:
             i = 0
+            ii = 0 
             for o in bpy.context.scene.objects:
                 if o.hide == False:
                     if o not in bodyobjects:
