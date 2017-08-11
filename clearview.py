@@ -18,12 +18,13 @@ class ClearView(bpy.types.Operator):
 
     my_string = bpy.props.StringProperty(name="String to isolate")
     bool1 = bpy.props.BoolProperty(name="Keep body group", default = True)
+    bool5 = bpy.props.BoolProperty(name="Keep rig", default = True)
     bool2 = bpy.props.BoolProperty(name="Move", default = True)
     bool3 = bpy.props.BoolProperty(name="Keep others visible")
     bool4 = bpy.props.BoolProperty(name="Ignore world", default = True)
 
     def execute(self, context):
-        s = self.my_string
+        s = self.my_string.lower()
         i = 0
         bodyobjects = []
 
@@ -35,8 +36,8 @@ class ClearView(bpy.types.Operator):
         for o in bpy.context.scene.objects:
             if self.bool3 == False:
                 o.hide = True
-            if (s in o.name):
-                if self.bool4 == True and "world" in o.name:
+            if (s in o.name.lower()):
+                if self.bool4 == True and "world" in o.name.lower():
                     print ("continune")
                     continue
                 o.hide = False
@@ -50,7 +51,7 @@ class ClearView(bpy.types.Operator):
         if self.bool1 == True:
             for o in bpy.context.scene.objects:
                 for g in bpy.data.groups:
-                    if g.name == "Body" or g.name == "body":
+                    if g.name.lower() == "body":
                         for go in g.objects:
                             if go.name == o.name:
                                 o.hide = False
@@ -61,11 +62,24 @@ class ClearView(bpy.types.Operator):
                                         bpy.context.scene.layers[i] = True
                                     i += 1
 
+        #Keep rig visible
+        if self.bool5 == True:
+            for o in bpy.context.scene.objects:
+                if o.type == 'ARMATURE':
+                    bodyobjects.append(o)
+                    o.hide = False
+                    i = 0
+                    for l in o.layers:
+                        if (l == True):
+                            bpy.context.scene.layers[i] = True
+                        i += 1
+
         #Move objects +1 on x
         if self.bool2 == True:
             i = 0
-            ii = 0 
             for o in bpy.context.scene.objects:
+                if "hit_" in o.name.lower():
+                    continue
                 if o.hide == False:
                     if o not in bodyobjects:
                         o.location[0] = i
